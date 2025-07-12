@@ -156,19 +156,6 @@ export class OrderListComponent implements OnInit {
       this.removerErro('All products have now been added.');
     }
   }
-  bloquearTeclasInvalidas(event: KeyboardEvent) {
-    const teclasProibidas = ['-', '+', 'e', 'E'];
-    if (teclasProibidas.includes(event.key)) {
-      event.preventDefault();
-    }
-  }
-
-  bloquearColagemInvalida(event: ClipboardEvent) {
-    const valorColado = event.clipboardData?.getData('text') || '';
-    if (!/^\d+$/.test(valorColado)) {
-      event.preventDefault();
-    }
-  }
 
   corrigirQuantidadeInvalida(index: number) {
     const item = this.novoPedido.items[index];
@@ -264,7 +251,6 @@ export class OrderListComponent implements OnInit {
     });
   }
 
-
   verDetalhes(id: number) {
     this.orderService.getById(id).subscribe({
       next: (res) => {
@@ -301,10 +287,5 @@ export class OrderListComponent implements OnInit {
     this.tamanhoPagina = tamanho;
 
     this.carregarPedidos();
-  }
-
-  onGlobalFilter(table: any, event: Event) {
-    const input = event.target as HTMLInputElement;
-    table.filterGlobal(input.value, 'contains');
   }
 }
