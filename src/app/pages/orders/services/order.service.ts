@@ -5,21 +5,22 @@ import { Order } from '../interfaces/order.interface';
 import { environment } from '../../../../environments/environment';
 import { Pagina } from '../../../shared/models/pagina.model';
 import { Resultado } from '../../../shared/models/resultado.model';
+import { OrderDetail } from '../interfaces/orderDetail.interface';
 
 @Injectable({ providedIn: 'root' })
 export class OrderService {
   private readonly apiUrl = `${environment.apiBaseUrl}/order`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   getAll(
     numeroPagina?: number,
     tamanhoPagina?: number,
     ordenarPor?: string,
     ordemAscendente?: string
-  ) : Observable<Pagina<Order>>{
-    
-    let params  = new HttpParams();
+  ): Observable<Pagina<Order>> {
+
+    let params = new HttpParams();
 
     if (numeroPagina !== undefined) params = params.set('NumeroPagina', numeroPagina);
     if (tamanhoPagina !== undefined) params = params.set('TamanhoPagina', tamanhoPagina);
@@ -29,7 +30,13 @@ export class OrderService {
     return this.http
       .get<Resultado<Pagina<Order>>>(this.apiUrl, { params })
       .pipe(map((res) => res.valor));
-
   }
-  
+
+  getById(id: number): Observable<OrderDetail> {
+    return this.http.get<{ valor: OrderDetail }>(`${this.apiUrl}/${id}`)
+      .pipe(
+        map(res => res.valor)
+      );
+  }
+
 }

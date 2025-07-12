@@ -13,6 +13,9 @@ import { ButtonModule } from 'primeng/button';
 import { InputIconModule } from 'primeng/inputicon';
 import { IconFieldModule } from 'primeng/iconfield';
 import { TagModule } from 'primeng/tag';
+import { DialogModule } from 'primeng/dialog';
+import { OrderDetail } from '../../../interfaces/orderDetail.interface';
+
 
 @Component({
   selector: 'app-order-list',
@@ -29,13 +32,16 @@ import { TagModule } from 'primeng/tag';
     MultiSelectModule,
     SliderModule,
     ProgressBarModule,
-    TagModule
+    TagModule,
+    DialogModule
   ]
 })
 
 export class OrderListComponent implements OnInit {
   orders: Order[] = [];
   loading = true;
+  pedidoSelecionado: OrderDetail | null = null;
+  detalheVisivel = false;
 
   paginaAtual = 1;
   tamanhoPagina = 10;
@@ -70,13 +76,40 @@ export class OrderListComponent implements OnInit {
   }
 
   aoPaginar(event: any) {
-  const pagina = event.first / event.rows + 1;
-  const tamanho = event.rows;
+    const pagina = event.first / event.rows + 1;
+    const tamanho = event.rows;
 
-  this.paginaAtual = pagina;
-  this.tamanhoPagina = tamanho;
+    this.paginaAtual = pagina;
+    this.tamanhoPagina = tamanho;
 
-  this.carregarPedidos();
-}
+    this.carregarPedidos();
+  }
+
+  selectedOrder: Order | null = null;
+  exibindoDetalhes = false;
+  exibindoEdicao = false;
+
+  verDetalhes(id: number) {
+    this.orderService.getById(id).subscribe({      
+      next: (res) => {
+        this.pedidoSelecionado = res;
+        this.detalheVisivel = true;
+      },
+      error: (err) => {
+        console.error('Erro ao buscar detalhes do pedido:', err);
+      }
+    });
+  }
+
+  editarPedido(order: Order) {
+    this.selectedOrder = order;
+    this.exibindoEdicao = true;
+  }
+
+  excluirPedido(order: Order) {
+    if (confirm(`Tem certeza que deseja excluir o pedido #${order.id}?`)) {
+    }
+  }
+
 
 }

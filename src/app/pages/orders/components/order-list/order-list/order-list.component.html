@@ -19,7 +19,7 @@
                 </th>
                 <th style="min-width: 14rem">
                     <div class="flex justify-between items-center">
-                        Order Date
+                        Date
                     </div>
                 </th>
                 <th style="min-width: 10rem">
@@ -32,6 +32,9 @@
                         Status
                     </div>
                 </th>
+                <th style="min-width: 1rem">
+                    Actions
+                </th>
             </tr>
         </ng-template>
         <ng-template #body let-order>
@@ -41,7 +44,49 @@
                 <td>{{ order.orderDate }}</td>
                 <td>{{ order.totalAmount }}</td>
                 <td>{{ order.status }}</td>
+                <td class="flex gap-2">
+                    <button pButton icon="pi pi-search" class="p-button-sm p-button-text" title="detail"
+                        (click)="verDetalhes(order.id)"></button>
+                    <button pButton icon="pi pi-pencil" class="p-button-sm p-button-text" (click)="editarPedido(order)"
+                        title="edit"></button>
+                    <button pButton icon="pi pi-trash" class="p-button-sm p-button-text p-button-danger"
+                        (click)="excluirPedido(order)" title="delete"></button>
+                </td>
+
             </tr>
         </ng-template>
     </p-table>
+    <p-dialog header="Order Detail" [(visible)]="detalheVisivel" modal [style]="{ width: '500px' }"
+        (onHide)="pedidoSelecionado = null">
+
+        <ng-container *ngIf="pedidoSelecionado">
+            <p><strong>Number:</strong> {{ pedidoSelecionado.id }}</p>
+            <p><strong>Customer:</strong> {{ pedidoSelecionado.customerName }}</p>
+            <p><strong>Date:</strong> {{ pedidoSelecionado.orderDate }}</p>
+            <p><strong>Total Amount:</strong> {{ pedidoSelecionado.totalAmount }}</p>
+            <p><strong>Status:</strong> {{ pedidoSelecionado.status }}</p>
+
+            <p><strong>Itens</strong></p>
+            <table class="w-full border-collapse">
+                <thead>
+                    <tr>
+                        <th class="text-left border-b pb-2">Name</th>
+                        <th class="text-left border-b pb-2">Quantity</th>
+                        <th class="text-left border-b pb-2">Unit Price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let item of pedidoSelecionado.items">
+                        <td class="py-1">{{ item.productName }}</td>
+                        <td class="py-1">{{ item.quantity }}</td>
+                        <td class="py-1">{{ item.unitPrice }}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+
+        </ng-container>
+
+    </p-dialog>
+
 </div>
