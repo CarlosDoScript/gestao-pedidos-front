@@ -2,9 +2,13 @@
     <p-table #dt1 [value]="orders" dataKey="id" [loading]="loading" [lazy]="true" [paginator]="true"
         [rows]="tamanhoPagina" [totalRecords]="totalRegistros" (onLazyLoad)="aoPaginar($event)" [showGridlines]="true"
         [rowHover]="true" responsiveLayout="scroll">
-
         <ng-template #caption>
+            <div class="flex justify-between items-center flex-column sm:flex-row">
+                <button pButton type="button" icon="pi pi-plus" iconPosition="left" class="ml-auto" label="Create Order"
+                    (click)="abrirCriarPedido()"></button>
+            </div>
         </ng-template>
+
         <ng-template #header>
             <tr>
                 <th style="min-width: 1rem">
@@ -56,9 +60,62 @@
             </tr>
         </ng-template>
     </p-table>
+
+    <p-dialog header="New Order" [(visible)]="criandoPedido" modal [style]="{ width: '600px' }"
+        (onHide)="resetarFormulario()">
+
+        <div class="p-fluid">
+            <div class="field">
+                <label for="cliente">Customer </label>
+                <p-dropdown [options]="clientes" optionLabel="name" optionValue="id" [(ngModel)]="novoPedido.customerId"
+                    placeholder="Select a customer">
+                </p-dropdown>
+            </div>
+
+            <div class="field">
+                <label>Products</label>
+                <div *ngFor="let item of novoPedido.items; let i = index" class="p-grid p-nogutter mb-2">
+                    <div class="p-col-6 pr-2">
+                        <p-dropdown [options]="produtosDisponiveis(i)" optionLabel="name" optionValue="id"
+                            [(ngModel)]="novoPedido.items[i].productId" placeholder="Select a product">
+                        </p-dropdown>
+
+                    </div>
+                    <div class="p-col-4 pr-2">
+                        <p-inputNumber [(ngModel)]="item.quantity" [min]="1" [showButtons]="true" [step]="1"
+                            [useGrouping]="false" inputStyleClass="w-full"
+                            (ngModelChange)="corrigirQuantidadeInvalida(i)">
+                        </p-inputNumber>
+                    </div>
+                    <div class="p-col-2">
+                        <button pButton icon="pi pi-trash" class="p-button-danger p-button-sm"
+                            (click)="removerItem(i)"></button>
+                    </div>
+                </div>
+
+
+                <button pButton icon="pi pi-plus" class="p-button-sm" label="Adicionar Item" (click)="adicionarItem()">
+                </button>
+            </div>
+
+            <div *ngIf="mensagensErro.length" style="color: red" class="mb-3 mt-5">
+                <ul class="pl-3">
+                    <li *ngFor="let erro of mensagensErro">{{ erro }}</li>
+                </ul>
+            </div>
+
+            <div class="flex justify-content-end gap-2 mt-3" style="width: 100%;">
+                <button pButton label="Cancelar" class="p-button-secondary" (click)="criandoPedido = false"></button>
+                <button pButton label="Salvar" class="p-button-success" (click)="salvarPedido()"></button>
+            </div>
+
+        </div>
+    </p-dialog>
+
+
+
     <p-dialog header="Order Detail" [(visible)]="detalheVisivel" modal [style]="{ width: '500px' }"
         (onHide)="pedidoSelecionado = null">
-
         <ng-container *ngIf="pedidoSelecionado">
             <p><strong>Number:</strong> {{ pedidoSelecionado.id }}</p>
             <p><strong>Customer:</strong> {{ pedidoSelecionado.customerName }}</p>
@@ -83,10 +140,7 @@
                     </tr>
                 </tbody>
             </table>
-
-
         </ng-container>
-
     </p-dialog>
-
 </div>
+<p-toast></p-toast>

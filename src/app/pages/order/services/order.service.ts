@@ -1,11 +1,12 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
-import { Order } from '../interfaces/order.interface';
+import { Order } from '../interfaces/IOrder.interface';
 import { environment } from '../../../../environments/environment';
 import { Pagina } from '../../../shared/models/pagina.model';
 import { Resultado } from '../../../shared/models/resultado.model';
-import { OrderDetail } from '../interfaces/orderDetail.interface';
+import { OrderDetail } from '../interfaces/IOrderDetail.interface';
+import { OrderCreate } from '../interfaces/IOrderCreate.interface';
 
 @Injectable({ providedIn: 'root' })
 export class OrderService {
@@ -39,4 +40,9 @@ export class OrderService {
       );
   }
 
+  post(payload: OrderCreate): Observable<OrderDetail> {
+    return this.http
+      .post<Resultado<OrderDetail>>(this.apiUrl, payload)
+      .pipe(map(res => res.valor));
+  }
 }
