@@ -70,13 +70,13 @@ export class OrderListComponent implements OnInit {
   }
 
   aoPaginar(event: any) {
-    const pagina = event.first / event.rows + 1;
-    const tamanho = event.rows;
+  const pagina = event.first / event.rows + 1;
+  const tamanho = event.rows;
 
-    this.paginaAtual = pagina;
-    this.tamanhoPagina = tamanho;
+  this.paginaAtual = pagina;
+  this.tamanhoPagina = tamanho;
 
-    this.carregarPedidos();
-  }
+  this.carregarPedidos();
+}
 
 }
