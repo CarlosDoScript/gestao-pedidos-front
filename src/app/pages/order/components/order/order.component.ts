@@ -72,6 +72,7 @@ export class OrderListComponent implements OnInit {
   selectedOrder: Order | null = null;
   exibindoDetalhes = false;
   exibindoEdicao = false;
+  editandoPedidoId: number | null = null;
 
   constructor(
     private orderService: OrderService,
@@ -122,6 +123,7 @@ export class OrderListComponent implements OnInit {
     this.resetarFormulario();
     this.criandoPedido = true;
   }
+
 
 
   resetarFormulario() {
@@ -195,41 +197,76 @@ export class OrderListComponent implements OnInit {
 
   salvarPedido() {
     this.mensagensErro = [];
-    console.log('Payload enviado:', this.novoPedido);
 
-    this.orderService.post(this.novoPedido).subscribe({
-      next: (pedidoCriado: OrderDetail | null) => {
-        if (!pedidoCriado) {
+    const payload = this.novoPedido;
+
+    const requisicao$ = this.editandoPedidoId
+      ? this.orderService.put(this.editandoPedidoId, payload)
+      : this.orderService.post(payload);
+
+    requisicao$.subscribe({
+      next: (pedido: OrderDetail | null) => {
+        if (!pedido) {
           this.messageService.add({
             severity: 'error',
-            summary: 'Erro ao criar pedido',
-            detail: 'A API retornou um resultado inválido.',
+            summary: 'Erro',
+            detail: 'A operação não retornou um resultado válido.',
             life: 3000
           });
           return;
         }
 
-        this.criandoPedido = false;
-        this.carregarPedidos();
+        const acao = this.editandoPedidoId ? 'atualizado' : 'criado';
 
         this.messageService.add({
           severity: 'success',
-          summary: 'Pedido criado com sucesso',
-          detail: `Pedido #${pedidoCriado.id} criado com sucesso.`,
+          summary: `Pedido ${acao} com sucesso`,
+          detail: `Pedido #${pedido.id}`,
           life: 3000
         });
 
+        this.carregarPedidos();
+        this.criandoPedido = false;
         this.resetarFormulario();
       },
       error: (error) => {
         if (error.error && Array.isArray(error.error.erros)) {
           this.mensagensErro = error.error.erros;
         } else {
-          this.mensagensErro = ['Erro inesperado ao criar pedido.'];
+          this.mensagensErro = ['Erro inesperado ao salvar pedido.'];
         }
       }
     });
   }
+
+
+  editarPedido(order: Order) {
+    this.orderService.getById(order.id).subscribe({
+      next: (pedido: OrderDetail) => {
+        this.novoPedido = {
+          customerId: pedido.customerId,
+          items: pedido.items.map(item => ({
+            productId: item.productId,
+            quantity: item.quantity
+          }))
+        };
+
+        this.editandoPedidoId = pedido.id;
+        this.carregarClientes();
+        this.carregarProdutos();
+        this.criandoPedido = true;
+      },
+      error: () => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Erro ao carregar pedido',
+          detail: 'Não foi possível carregar os dados para edição.',
+          life: 3000
+        });
+      }
+    });
+  }
+
 
   verDetalhes(id: number) {
     this.orderService.getById(id).subscribe({
@@ -241,11 +278,6 @@ export class OrderListComponent implements OnInit {
         console.error('Erro ao buscar detalhes do pedido:', err);
       }
     });
-  }
-
-  editarPedido(order: Order) {
-    this.selectedOrder = order;
-    this.exibindoEdicao = true;
   }
 
   excluirPedido(order: Order) {

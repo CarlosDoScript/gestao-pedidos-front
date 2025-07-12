@@ -45,4 +45,11 @@ export class OrderService {
       .post<Resultado<OrderDetail>>(this.apiUrl, payload)
       .pipe(map(res => res.valor));
   }
+
+  put(id: number, payload: OrderCreate): Observable<OrderDetail> {
+    return this.http
+      .put<Resultado<OrderDetail>>(`${this.apiUrl}/${id}`, payload)
+      .pipe(map(res => res.valor));
+  }
+
 }

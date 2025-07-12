@@ -61,12 +61,13 @@
         </ng-template>
     </p-table>
 
-    <p-dialog header="New Order" [(visible)]="criandoPedido" modal [style]="{ width: '600px' }"
-        (onHide)="resetarFormulario()">
+    <p-dialog [header]="editandoPedidoId ? 'Edit Order' : 'New Order'" [(visible)]="criandoPedido" modal
+        [style]="{ width: '600px' }" (onHide)="resetarFormulario()">
 
         <div class="p-fluid">
+
             <div class="field">
-                <label for="cliente">Customer </label>
+                <label for="cliente">Customer</label>
                 <p-dropdown [options]="clientes" optionLabel="name" optionValue="id" [(ngModel)]="novoPedido.customerId"
                     placeholder="Select a customer">
                 </p-dropdown>
@@ -74,27 +75,29 @@
 
             <div class="field">
                 <label>Products</label>
+
                 <div *ngFor="let item of novoPedido.items; let i = index" class="p-grid p-nogutter mb-2">
                     <div class="p-col-6 pr-2">
                         <p-dropdown [options]="produtosDisponiveis(i)" optionLabel="name" optionValue="id"
                             [(ngModel)]="novoPedido.items[i].productId" placeholder="Select a product">
                         </p-dropdown>
-
                     </div>
+
                     <div class="p-col-4 pr-2">
                         <p-inputNumber [(ngModel)]="item.quantity" [min]="1" [showButtons]="true" [step]="1"
                             [useGrouping]="false" inputStyleClass="w-full"
                             (ngModelChange)="corrigirQuantidadeInvalida(i)">
                         </p-inputNumber>
                     </div>
+
                     <div class="p-col-2">
-                        <button pButton icon="pi pi-trash" class="p-button-danger p-button-sm"
-                            (click)="removerItem(i)"></button>
+                        <button pButton icon="pi pi-trash" class="p-button-danger p-button-sm" (click)="removerItem(i)">
+                        </button>
                     </div>
                 </div>
 
-
-                <button pButton icon="pi pi-plus" class="p-button-sm" label="Adicionar Item" (click)="adicionarItem()">
+                <button pButton icon="pi pi-plus" class="p-button-sm mt-2" label="Add Product"
+                    (click)="adicionarItem()" [disabled]="produtosDisponiveis(-1).length === 0">
                 </button>
             </div>
 
@@ -105,12 +108,18 @@
             </div>
 
             <div class="flex justify-content-end gap-2 mt-3" style="width: 100%;">
-                <button pButton label="Cancelar" class="p-button-secondary" (click)="criandoPedido = false"></button>
-                <button pButton label="Salvar" class="p-button-success" (click)="salvarPedido()"></button>
+                <button pButton label="Cancelar" class="p-button-secondary"
+                    (click)="criandoPedido = false; resetarFormulario()">
+                </button>
+
+                <button pButton [label]="editandoPedidoId ? 'Atualizar' : 'Salvar'" class="p-button-success"
+                    (click)="salvarPedido()">
+                </button>
             </div>
 
         </div>
     </p-dialog>
+
 
 
 
