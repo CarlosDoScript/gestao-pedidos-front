@@ -52,4 +52,8 @@ export class OrderService {
       .pipe(map(res => res.valor));
   }
 
+  delete(id: number): Observable<Resultado<void>> {
+    return this.http
+      .delete<Resultado<void>>(`${this.apiUrl}/${id}`)      
+  }
 }

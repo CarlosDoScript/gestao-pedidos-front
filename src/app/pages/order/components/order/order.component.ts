@@ -124,8 +124,6 @@ export class OrderListComponent implements OnInit {
     this.criandoPedido = true;
   }
 
-
-
   resetarFormulario() {
     this.novoPedido = {
       customerId: 0,
@@ -138,17 +136,16 @@ export class OrderListComponent implements OnInit {
     const disponiveis = this.produtosDisponiveis(-1);
 
     if (disponiveis.length === 0) {
-      if (!this.mensagensErro.includes('Todos os produtos já foram adicionados.')) {
-        this.mensagensErro.push('Todos os produtos já foram adicionados.');
+      if (!this.mensagensErro.includes('All products have now been added.')) {
+        this.mensagensErro.push('All products have now been added.');
       }
       return;
     }
 
     this.novoPedido.items.push({ productId: 0, quantity: 1 });
 
-    this.removerErro('Todos os produtos já foram adicionados.');
+    this.removerErro('All products have now been added.');
   }
-
 
   removerItem(index: number) {
     this.novoPedido.items.splice(index, 1);
@@ -156,7 +153,7 @@ export class OrderListComponent implements OnInit {
     const aindaHaProdutosDisponiveis = this.produtosDisponiveis(-1).length > 0;
 
     if (aindaHaProdutosDisponiveis) {
-      this.removerErro('Todos os produtos já foram adicionados.');
+      this.removerErro('All products have now been added.');
     }
   }
   bloquearTeclasInvalidas(event: KeyboardEvent) {
@@ -209,19 +206,19 @@ export class OrderListComponent implements OnInit {
         if (!pedido) {
           this.messageService.add({
             severity: 'error',
-            summary: 'Erro',
-            detail: 'A operação não retornou um resultado válido.',
+            summary: 'Error',
+            detail: 'The operation did not return a valid result.',
             life: 3000
           });
           return;
         }
 
-        const acao = this.editandoPedidoId ? 'atualizado' : 'criado';
+        const acao = this.editandoPedidoId ? 'update' : 'create';
 
         this.messageService.add({
           severity: 'success',
-          summary: `Pedido ${acao} com sucesso`,
-          detail: `Pedido #${pedido.id}`,
+          summary: `Order ${acao} successfully`,
+          detail: `Order #${pedido.id}`,
           life: 3000
         });
 
@@ -233,7 +230,7 @@ export class OrderListComponent implements OnInit {
         if (error.error && Array.isArray(error.error.erros)) {
           this.mensagensErro = error.error.erros;
         } else {
-          this.mensagensErro = ['Erro inesperado ao salvar pedido.'];
+          this.mensagensErro = ['Unexpected error saving order.'];
         }
       }
     });
@@ -259,8 +256,8 @@ export class OrderListComponent implements OnInit {
       error: () => {
         this.messageService.add({
           severity: 'error',
-          summary: 'Erro ao carregar pedido',
-          detail: 'Não foi possível carregar os dados para edição.',
+          summary: 'Error loading order',
+          detail: 'Unable to load data for editing.',
           life: 3000
         });
       }
@@ -275,13 +272,24 @@ export class OrderListComponent implements OnInit {
         this.detalheVisivel = true;
       },
       error: (err) => {
-        console.error('Erro ao buscar detalhes do pedido:', err);
+        console.error('Error fetching order details:', err);
       }
     });
   }
 
   excluirPedido(order: Order) {
-    if (confirm(`Tem certeza que deseja excluir o pedido #${order.id}?`)) {
+    if (confirm(`Are you sure you want to delete the order? #${order.id}?`)) {
+      this.orderService.delete(order.id).subscribe({
+        next: () => {
+          this.messageService.add({
+            severity: 'success',
+            summary: `Order`,
+            detail: `Order #${order.id} deleted successfully`,
+            life: 3000
+          });
+          this.carregarPedidos();
+        }
+      })
     }
   }
 
